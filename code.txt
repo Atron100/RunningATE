@@ -1,0 +1,87 @@
+from configparser import ConfigParser
+import tkinter as tk
+from tkinter import ttk
+from tkinter.messagebox import CANCEL
+
+class DB_setup(tk.Tk):
+    def __init__(self):
+        super().__init__()
+
+        self.geometry('400x150+50+50')
+        self.title('DB Setup')
+        self.resizable(0, 0)
+        
+        parsed_val = read_ini_and_display("D:\Work\RunningEngine\db_config.ini")
+        
+        section_data = parsed_val.get("DB_CONFIG", {})
+        section_data_list = list(section_data.items())
+        
+        
+        # label 1
+        label1 = ttk.Label(self, text='DB login:')
+        label1.grid(column=0, row=0, sticky=tk.W, padx=5, pady=5)
+        
+        # label 2
+        label2 = ttk.Label(self, text=section_data_list[0][1])
+        label2.grid(column=1, row=0, sticky=tk.W, padx=5, pady=5)
+        
+        # label 3
+        label3 = ttk.Label(self, text='DB Password:')
+        label3.grid(column=0, row=1, sticky=tk.W, padx=5, pady=5)
+        
+        # label 4
+        label4 = ttk.Label(self, text=section_data_list[1][1])
+        label4.grid(column=1, row=1, sticky=tk.W, padx=5, pady=5)
+        
+        # label 5
+        label5 = ttk.Label(self, text='DB Server:')
+        label5.grid(column=0, row=2, sticky=tk.W, padx=5, pady=5)
+        
+        # label 6
+        label6 = ttk.Label(self, text=section_data_list[2][1])
+        label6.grid(column=1, row=2, sticky=tk.W, padx=5, pady=5)
+        
+        # button Start
+        OK_button = ttk.Button(self, text="OK", command=lambda:(quit()))
+        OK_button.grid(column=1, row=12, sticky=tk.S, padx=10, pady=10)
+        
+def parse_array(value_str):
+    # Remove leading and trailing whitespace and parentheses
+    value_str = value_str.strip("[]").strip()
+
+    # Split the string by comma and strip whitespace from each element
+    elements = [elem.strip() for elem in value_str.split(",")]
+
+    return elements
+
+def read_ini_and_display(filename: str) -> Dict[str, Any]:
+    config = ConfigParser()
+    config.read(filename)
+    
+    parsed_data = {}
+    
+    for section in config.sections():
+        section_data = {}
+        sect = f"{section}"
+        
+        for option in config.options(sect):
+            # Get the value of each option
+            value_str = config.get(section, option)
+            # Create a label to display the option and its value
+            # create_label(root, f"{option}: {value}")
+            # Convert the string representation of the array to a Python list
+            value = parse_array(value_str)
+            
+            # Add the option and its value to the section data
+            section_data[option] = value
+        
+        # Add the section data to the parsed data
+        parsed_data[section] = section_data
+        
+    return parsed_data    
+        
+        
+
+if __name__ == "__main__":
+    app = DB_setup()
+    app.mainloop()
